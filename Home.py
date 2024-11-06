@@ -1,20 +1,21 @@
 import streamlit as st
 import pandas as pd
 
+def filtrar(df, label, coluna):
+    filtro = st.multiselect(label, df[coluna].unique())
+    if filtro:
+        return df[df[coluna].isin(filtro)]
+    return df
+
 st.title("Uso Paraguaçu")
 
 url = "https://raw.githubusercontent.com/muginito/uso-paraguacu/refs/heads/main/dados/USO_PARAGUACU.CSV"
 
 df = pd.read_csv(url)
 
-filtro_cidades = st.multiselect("Cidades", df["MUNICIPIO"].unique())
+filtro_cidades = filtrar(df, "Cidades", "MUNICIPIO")
 
-if filtro_cidades:
-    df_filtrado = df[df["MUNICIPIO"].isin(filtro_cidades)]
-else:
-    df_filtrado = df
-
-st.dataframe(df_filtrado,
+st.dataframe(filtro_cidades,
              width=1000,
              height=700,
              column_config={

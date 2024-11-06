@@ -3,7 +3,9 @@ import pandas as pd
 
 st.title("Uso Paraguaçu")
 
-df = pd.read_csv(r".\dados\USO_PARAGUACU.CSV")
+url = "https://raw.githubusercontent.com/muginito/uso-paraguacu/refs/heads/main/dados/USO_PARAGUACU.CSV"
+
+df = pd.read_csv(url)
 
 filtro_cidades = st.multiselect("Cidades", df["MUNICIPIO"].unique())
 

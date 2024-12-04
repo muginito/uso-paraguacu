@@ -1,11 +1,6 @@
 import streamlit as st
 from streamlit_folium import *
-import pandas as pd
-import geopandas as gpd
-from dotenv import load_dotenv
-from os import getenv
 import folium
-import streamlit.components.v1 as components
 
 st.header("Mapa Interativo")
 
@@ -21,32 +16,19 @@ seletores = {
     "Rodovias": st.secrets["RODOVIAS"]
 }
 
-# gdf = gpd.read_file(r"./dados/geojson/CursoDagua.geojson").simplify(tolerance=0.001, preserve_topology=True)
+@st.cache_data
+def carregar_geojson(url):
+    """Função para carregar e retornar a URL do GeoJSON."""
+    return url
 
-# geojson_data = gdf.to_json()
+base_map = folium.Map(location=[-12.900, -41.314], zoom_start=7)
+base_map.fit_bounds([[-13.891012650559619, -42.65575422399996], [-10.734992022654184, -38.64452899499997]])
 
-map = folium.Map(location=[-12.900, -41.314], zoom_start=10)
 
-# folium.GeoJson(geojson_data, name="geojson").add_to(map)
+select = st.selectbox("GeoJson", seletores.keys(), index=5)
 
-select = st.multiselect("GeoJson", seletores)
+geojson_url = carregar_geojson(seletores.get(select))
+geojson_layer = folium.GeoJson(geojson_url, name=select)
+geojson_layer.add_to(base_map)
 
-# if select:
-#     file_path = seletores.get(select[0])
-#     gdf = gpd.read_file(file_path)
-#     geojson_data = gdf.to_json()\
-#     # .simplify(tolerance=0.001, preserve_topology=True)
-#     folium.GeoJson(geojson_data, name="geojson").add_to(map)
-
-@ st.cache_data
-def carregar_geojson(l, seletores):
-    file_path = seletores.get(l[0])
-    gdf = gpd.read_file(file_path)
-    return gdf.to_json()
-
-if select:
-    geojson_data = carregar_geojson(select, seletores)
-    folium.GeoJson(geojson_data, name="geojson").add_to(map)
-
-with st.container():
-    st_data = st_folium(map, use_container_width=True)
+st_data = st_folium(base_map, use_container_width=True)
